@@ -2,8 +2,9 @@ services:
   - type: web
     name: regicide-arena
     runtime: node
+    region: singapore
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install && npm test
     startCommand: npm start
     healthCheckPath: /health
     envVars:

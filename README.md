@@ -1,5 +1,9 @@
 # Regicide — The Royal Arena
 
+**Play online: [regicide-arena.onrender.com](https://regicide-arena.onrender.com/)**
+
+The public game runs on Render independently of your computer. Open the link, create a duel, share the invite, and both players select Ready. Free hosting may take about a minute to wake after inactivity.
+
 A playable real-time 1v1 chess arena fighter: two human players, one chess class each, one floating 8×8 board. A Three.js client renders the arena and an authoritative Node/WebSocket server validates every move, attack, cooldown, and hit.
 
 ## Run locally
