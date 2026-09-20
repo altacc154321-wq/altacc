@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1716"><meta name="description" content="Regicide. Chess rules. Real-time combat. A two-player 3D arena fighter.">
+  <title>REGICIDE — The Royal Arena</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E♜%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
+  <script type="importmap">{"imports":{"three":"/vendor/three.module.js"}}</script>
+</head>
+<body>
+  <canvas id="arena" aria-label="Interactive 3D chess arena"></canvas>
+  <div class="vignette"></div>
+  <header id="header">
+    <a class="brand" href="/" aria-label="Regicide home"><span class="brand-mark">♜</span><span>REGICIDE<small>THE ROYAL ARENA</small></span></a>
+    <nav><span class="nav-active">THE ARENA</span><button id="manual-open">FIELD MANUAL <span>↗</span></button></nav>
+    <div class="header-actions"><span class="online-label"><i></i> 1V1 MULTIPLAYER</span><button class="icon-button" id="sound" aria-label="Enable sound" title="Toggle sound">♪<span class="sound-line"></span></button><button class="icon-button" id="fullscreen" aria-label="Fullscreen" title="Fullscreen">⛶</button></div>
+  </header>
+
+  <main id="lobby">
+    <section class="intro">
+      <div class="eyebrow"><span></span> CHESS, UNLEASHED.</div>
+      <h1>Every move.<br>A <em>power play.</em></h1>
+      <p class="lede">The rules are ancient. The fight is real-time.<br>Choose your piece. Challenge a rival. Claim the board.</p>
+      <div class="match-facts"><span><b>06</b> CLASSES</span><span><b>02</b> PLAYERS</span><span><b>00</b> TURNS</span></div>
+      <section class="room-panel" aria-label="Multiplayer lobby">
+        <div id="room-form">
+          <div class="room-tabs"><button class="active" id="create-tab">CREATE A DUEL</button><button id="join-tab">JOIN A DUEL</button></div>
+          <label class="field-label" for="player-name">YOUR NAME</label><input id="player-name" maxlength="20" placeholder="Enter your name" value="Challenger" autocomplete="nickname">
+          <div id="join-field" hidden><label class="field-label" for="room-input">ROOM CODE</label><input id="room-input" maxlength="6" placeholder="ABCDEF" autocomplete="off" spellcheck="false"></div>
+          <button class="primary" id="enter-arena">CREATE DUEL <span>↗</span></button>
+          <p class="room-note"><span class="small-lock">◇</span> Private room · Share a code. Settle the score.</p>
+        </div>
+        <div id="room-waiting" hidden>
+          <div class="waiting-head"><span class="eyebrow">YOUR DUEL</span><button id="leave-room" class="text-button">Leave ↗</button></div>
+          <button id="copy-code" title="Copy invite link"><strong id="room-code">------</strong><span>COPY INVITE ↗</span></button>
+          <div id="room-players"></div><button id="ready" class="primary">READY TO FIGHT <span>→</span></button>
+          <p class="room-note" id="waiting-note">Share your invite with a second player.</p>
+        </div>
+      </section>
+    </section>
+    <div class="arena-caption"><span class="dot"></span> THE OBSIDIAN COURT <span class="caption-line"></span> ARENA 01</div>
+    <section class="champion-info" aria-label="Selected champion">
+      <div class="champion-top"><span class="eyebrow">YOUR CHAMPION</span><span id="champion-number">02 / 06</span></div>
+      <div class="champion-heading"><h2 id="champion-name">The Knight</h2><span class="role-pill" id="champion-role">THE DISRUPTOR</span></div>
+      <p id="champion-description"></p>
+      <div class="champion-bottom"><div id="move-diagram" aria-label="Movement pattern"></div><div class="champion-stats"><span>VITALITY <b id="stat-hp"></b></span><span>STRIKE <b id="stat-damage"></b></span><span>RECOVERY <b id="stat-cooldown"></b></span></div></div>
+    </section>
+    <section class="roster-section" aria-label="Choose your chess piece"><div class="roster-label"><span>CHOOSE YOUR PIECE</span><span>SIX WAYS TO RULE.</span></div><div id="roster"></div></section>
+  </main>
+
+  <main id="game" hidden>
+    <div class="fighter-hud own"><span id="own-color" class="fighter-color">WHITE / YOU</span><div class="fighter-name"><span id="own-glyph">♞</span><strong id="own-name">Challenger</strong><span id="own-piece">Knight</span></div><div class="health-track"><div id="own-health"></div></div><span id="own-hp" class="hp-numbers"></span></div>
+    <div class="match-center"><span class="eyebrow">LIVE DUEL</span><strong id="match-time">00:00</strong><span id="match-code"></span></div>
+    <div class="fighter-hud enemy"><span id="enemy-color" class="fighter-color">BLACK / RIVAL</span><div class="fighter-name"><span id="enemy-glyph">♜</span><strong id="enemy-name">Rival</strong><span id="enemy-piece">Rook</span></div><div class="health-track"><div id="enemy-health"></div></div><span id="enemy-hp" class="hp-numbers"></span></div>
+    <div id="announcement" role="status"></div>
+    <div class="battle-help"><span class="eyebrow" id="battle-class">THE KNIGHT</span><p id="battle-rules"></p><span><kbd>DRAG</kbd> Look around <span class="help-divider">/</span> <kbd>SCROLL</kbd> Zoom</span><span><kbd>SPACE</kbd> Strike rival <span class="help-divider">/</span> <kbd>R</kbd> Reset view</span><button id="game-manual" class="text-button">Field manual ↗</button></div>
+    <div class="action-dock"><div id="target-hint">CHOOSE A HIGHLIGHTED SQUARE</div><div class="action-buttons"><button id="move-action" class="action active"><kbd>Q</kbd><span class="action-icon">◇</span><span><strong>MOVE</strong><small id="move-time">READY</small></span><i id="move-progress"></i></button><button id="attack-action" class="action"><kbd>E</kbd><span class="action-icon">✧</span><span><strong>STRIKE</strong><small id="attack-time">READY</small></span><i id="attack-progress"></i></button></div><span class="dock-note"><span class="teal-dot"></span> LEGAL MOVE <span class="red-dot"></span> LEGAL STRIKE</span></div>
+    <div class="tactical"><div class="tactical-title"><span>TACTICAL VIEW</span><span id="position-name">D2</span></div><div id="tactical-board" role="group" aria-label="Choose a destination square"></div><div class="tactical-legend">A <span>B</span> C <span>D</span> E <span>F</span> G <span>H</span></div></div>
+    <button id="exit-match" class="text-button">Leave duel ↗</button>
+  </main>
+  <div id="victory" hidden><div class="victory-card"><span class="eyebrow">THE BOARD HAS SPOKEN</span><div class="victory-crown">♚</div><h2 id="winner-text">WHITE WINS</h2><p id="victory-description">A crown earned. A rival captured.</p><button id="rematch" class="primary">INSTANT REMATCH <span>↻</span></button><button id="victory-leave" class="text-button">Return to the arena</button></div></div>
+  <footer id="footer"><span><i id="connection-dot"></i><span id="connection-label">CONNECTING TO ARENA</span></span><span>REAL-TIME. RULE-BOUND.</span><span>EST. MMXXVI <span class="footer-diamond">◆</span></span></footer>
+  <div id="toast" role="status"></div>
+  <dialog id="manual"><button class="dialog-close" id="manual-close" aria-label="Close manual">×</button><div class="eyebrow">THE FIELD MANUAL</div><h2>Know your piece.<br><em>Own the board.</em></h2><p>Two human players. One piece each. Real-time combat on an 8×8 board. Reduce your rival’s health to zero to claim victory.</p><div class="manual-controls"><span><kbd>Q</kbd> Target a legal move</span><span><kbd>E</kbd> Target a legal strike</span><span><kbd>CLICK</kbd> Commit on the board or map</span><span><kbd>SPACE</kbd> Strike your rival’s square</span><span><kbd>DRAG</kbd> Rotate the camera</span><span><kbd>↑ ↓ ← →</kbd> Select tile · Enter to commit</span></div><div id="manual-pieces"></div><p class="manual-note">Teal tiles show legal movement. Red tiles show legal attacks. Attacks have a visible windup: move before impact to evade. Sliding pieces cannot pass through a rival. Knights leap over them. Every attack returns to its origin. Pawns cannot retreat or promote; plan your advance carefully. Mutually unreachable pieces draw automatically so neither player is stranded.</p><p class="manual-note">Controller: left stick selects squares, right stick rotates the camera, A commits, X targets attacks, Y targets movement. No unrestricted running.</p><button id="manual-done" class="primary">I'M READY <span>→</span></button></dialog>
+  <script type="module" src="/app.js"></script>
+  <noscript>This 3D multiplayer game requires JavaScript.</noscript>
+</body>
+</html>
